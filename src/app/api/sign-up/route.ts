@@ -4,9 +4,28 @@ import UserModel from "@/model/User";
 import bcrypt from "bcryptjs";
 
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
+import { signUpRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request){
     await dbConnect()
+
+    // Rate Limiting Check
+    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    try {
+        const { success } = await signUpRateLimit.limit(ip);
+        if (!success) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "Too many sign-up attempts. Please try again later."
+                },
+                { status: 429 }
+            );
+        }
+    } catch (error) {
+        console.error("Rate limit error:", error);
+        // Fail open if Redis is down
+    }
 
     try {
         const {username, email, password} = await request.json()
@@ -20,7 +39,7 @@ export async function POST(request: Request){
             return Response.json({
                 success: false,
                 message: "Username is already taken"
-            }), {status: 400}
+            }, {status: 400})
         }
 
         const existingUserByEmail = await UserModel.findOne({email})
@@ -70,7 +89,7 @@ export async function POST(request: Request){
         if(!emailResponse.success){
             return Response.json({
                 success: false,
-                message: email.Response.message
+                message: emailResponse.message
             }, {status: 500})
         }
 
@@ -80,7 +99,7 @@ export async function POST(request: Request){
         }, {status: 201})
 
     } catch (error) {
-        console.log('Error registering user', error)
+        // Error logging removed for security
         return Response.json(
             {
                 success: false,
