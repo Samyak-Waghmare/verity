@@ -1,4 +1,5 @@
-import { resend } from "@/lib/resend";
+import nodemailer from 'nodemailer';
+import { render } from '@react-email/render';
 import VerificationEmail from "../../emails/VerificationEmail";
 import { ApiResponse } from "@/types/ApiResponse";
 
@@ -8,15 +9,29 @@ export async function sendVerificationEmail(
     verifyCode: string
 ): Promise<ApiResponse>{
     try {
-        await resend.emails.send({
-            from: 'onboarding@resend.dev',
-            to: email,
-            subject: 'Mystry message | Verification code',
-            react: VerificationEmail({username: username, otp: verifyCode}),
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
         });
-        return {success: true, message: 'Verification email send successfully'}
+
+        // Convert the React email template into static HTML
+        const emailHtml = await render(VerificationEmail({ username, otp: verifyCode }));
+
+        const options = {
+            from: `"Verity" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Verity | Your Verification Code',
+            html: emailHtml,
+        };
+
+        await transporter.sendMail(options);
+
+        return {success: true, message: 'Verification email sent successfully'}
     } catch (emailError) {
-        console.log("Error sending verification email", emailError)
+        console.error("Error sending verification email", emailError)
         return {success: false, message: 'Failed to send verification email'}
     }
 }
