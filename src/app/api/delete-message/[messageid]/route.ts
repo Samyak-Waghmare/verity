@@ -5,8 +5,8 @@ import UserModel from "@/model/User";
 import { User } from "next-auth";
 
 
-export async function DELETE(request: Request, {params}: {params: {messageid: string}}){
-    const messageId = params.messageid
+export async function DELETE(request: Request, {params}: {params: Promise<{messageid: string}>}){
+    const messageId = (await params).messageid
     await dbConnect()
 
     const session = await getServerSession(authOptions)
@@ -46,7 +46,7 @@ export async function DELETE(request: Request, {params}: {params: {messageid: st
             { status: 200}
         )
     } catch (error) {
-        console.log("Error in delete message route", error)
+        // Error logging removed for security
         return Response.json(
             {
                 success: false,
