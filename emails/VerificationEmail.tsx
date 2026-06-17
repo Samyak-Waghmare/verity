@@ -7,7 +7,7 @@ import {
   Row,
   Section,
   Text,
-  Button,
+  Container,
 } from '@react-email/components';
 
 interface VerificationEmailProps {
@@ -32,37 +32,33 @@ export default function VerificationEmail({ username, otp }: VerificationEmailPr
         />
       </Head>
 
-      <Preview>Here&apos;s your verification code: {otp}</Preview>
+      <Preview>Here's your verification code: {otp}</Preview>
 
-      <Section>
-        <Row>
-          <Heading as="h2">Hello {username},</Heading>
-        </Row>
-        <Row>
-          <Text>
-            Thank you for registering. Please use the following verification
-            code to complete your registration:
-          </Text>
-        </Row>
-        <Row>
-          <Text>{otp}</Text>
-        </Row>
-        <Row>
-          <Text>
-            If you did not request this code, please ignore this email.
-          </Text>
-        </Row>
-
-        {/* 
-        <Row>
-          <Button
-            href={`http://localhost:3000/verify/${username}`}
-            style={{ color: '#61dafb' }}
-          >
-            Verify here
-          </Button>
-        </Row> 
-        */}
+      <Section style={{ backgroundColor: '#ffffff', padding: '40px 0' }}>
+        <Container style={{ margin: '0 auto', maxWidth: '600px', backgroundColor: '#fafafa', borderRadius: '8px', padding: '40px', border: '1px solid #eaeaea' }}>
+          <Row>
+            <Heading as="h2" style={{ color: '#333333', textAlign: 'center', marginBottom: '20px' }}>
+              Welcome to Verity, {username}!
+            </Heading>
+          </Row>
+          <Row>
+            <Text style={{ color: '#555555', fontSize: '16px', lineHeight: '24px', textAlign: 'center' }}>
+              Thank you for registering. To complete your registration and start receiving anonymous messages, please enter the following verification code:
+            </Text>
+          </Row>
+          <Row>
+            <Section style={{ backgroundColor: '#f4f4f5', padding: '20px', borderRadius: '8px', margin: '20px 0', textAlign: 'center' }}>
+              <Text style={{ fontSize: '32px', fontWeight: 'bold', letterSpacing: '8px', color: '#111111', margin: '0' }}>
+                {otp}
+              </Text>
+            </Section>
+          </Row>
+          <Row>
+            <Text style={{ color: '#888888', fontSize: '14px', textAlign: 'center', marginTop: '30px' }}>
+              If you did not request this code, please ignore this email.
+            </Text>
+          </Row>
+        </Container>
       </Section>
     </Html>
   );
