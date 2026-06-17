@@ -86,7 +86,7 @@ export const authOptions: NextAuthOptions = {
 
                     return true
                 } catch (error) {
-                    console.error("Error during Google sign-in:", error)
+                    // silently fail
                     return false
                 }
             }

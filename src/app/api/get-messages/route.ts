@@ -75,7 +75,7 @@ export async function GET(request: Request){
         return Response.json(
             {
                 success: false,
-                message: "Not Authenticated"
+                message: "Error getting messages"
             },
             { status: 500}
         )

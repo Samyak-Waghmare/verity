@@ -35,8 +35,6 @@ function MessagePage() {
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           setIsUserNotFound(true)
-        } else {
-          console.error("Failed to fetch profile", error)
         }
       } finally {
         setProfileLoading(false)
