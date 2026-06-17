@@ -3,7 +3,10 @@ import mongoose, {Schema, Document, Types} from "mongoose";
 export interface Message extends Document{
     _id: Types.ObjectId;
     content: string;
-    createdAt: Date
+    createdAt: Date;
+    isPublic: boolean;
+    replyText?: string;
+    replyCreatedAt?: Date;
 }
 
 const MessageSchema: Schema<Message> = new Schema({
@@ -15,17 +18,33 @@ const MessageSchema: Schema<Message> = new Schema({
         type: Date,
         required: true,
         default: Date.now
+    },
+    isPublic: {
+        type: Boolean,
+        default: false
+    },
+    replyText: {
+        type: String,
+        required: false
+    },
+    replyCreatedAt: {
+        type: Date,
+        required: false
     }
 })
 
 export interface User extends Document{
     username: string;
     email: string;
-    password: string;
-    verifyCode: string;
-    verifyCodeExpiry: Date;
+    password?: string;
+    verifyCode?: string;
+    verifyCodeExpiry?: Date;
     isVerified: boolean;
     isAcceptingMessage: boolean;
+    provider?: string;
+    themePreset?: string;
+    avatarUrl?: string;
+    profileViews: number;
     messages: Message[]
 }
 
@@ -34,7 +53,8 @@ const UserSchema: Schema<User> = new Schema({
         type: String,
         required: [true, "Username is required"],
         trim: true,
-        unique: true
+        unique: true,
+        index: true
     },
     email: {
         type: String,
@@ -44,15 +64,19 @@ const UserSchema: Schema<User> = new Schema({
     },
     password: {
         type: String,
-        required: [true, "Password is required"]
+        required: false
     },
     verifyCode: {
         type: String,
-        required: [true, "Verify code is required"]
+        required: false
     },
     verifyCodeExpiry: {
         type: Date,
-        required: [true, "Verify code Expiry is required"]
+        required: false
+    },
+    provider: {
+        type: String,
+        default: 'credentials'
     },
     isVerified: {
         type: Boolean,
@@ -61,6 +85,18 @@ const UserSchema: Schema<User> = new Schema({
     isAcceptingMessage: {
         type: Boolean,
         default: true
+    },
+    themePreset: {
+        type: String,
+        default: 'dark'
+    },
+    avatarUrl: {
+        type: String,
+        required: false
+    },
+    profileViews: {
+        type: Number,
+        default: 0
     },
     messages: [MessageSchema]
 })
