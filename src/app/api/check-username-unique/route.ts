@@ -10,7 +10,7 @@ const UsernameQuerySchema = z.object({
 export async function GET(request: Request){
     //use these in all other routes
     //No need to do this nextjs take care of this
-    // console.log(`Received request with method: ${request.method}`);
+    // method requested
     // if(request.method !== 'GET'){
     //     return Response.json({
     //         success: false,
@@ -29,7 +29,7 @@ export async function GET(request: Request){
         //validate with zod
         const result = UsernameQuerySchema.safeParse(queryParam)
 
-        // console.log(result);
+        // valid schema
         if(!result.success){
             const usernameErrors = result.error.format().username?._errors || []
             return Response.json({
@@ -54,7 +54,7 @@ export async function GET(request: Request){
         }, {status: 400})
 
     } catch (error) {
-        console.error("Error checking username", error)
+        // Error logging removed for security
         return Response.json(
             {
                 success: false,
