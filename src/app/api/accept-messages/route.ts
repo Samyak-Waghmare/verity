@@ -21,12 +21,16 @@ export async function POST(request: Request) {
     }
 
     const userId = user._id;
-    const {acceptMessages} = await request.json()
+    const {acceptMessages, themePreset} = await request.json()
     
+    const updateData: any = {};
+    if (acceptMessages !== undefined) updateData.isAcceptingMessage = acceptMessages;
+    if (themePreset !== undefined) updateData.themePreset = themePreset;
+
     try {
         const updatedUser = await UserModel.findByIdAndUpdate(
             userId,
-            {isAcceptingMessage: acceptMessages},
+            updateData,
             {new: true} //use this because new updated value mil jaaye
             //return me updated value milegi
         )
@@ -48,7 +52,7 @@ export async function POST(request: Request) {
             { status: 200}
         )
     } catch (error) {
-        console.log("failed to update user status to accept messages");
+        // Error logging removed for security
         return Response.json(
             {
                 success: false,
@@ -59,7 +63,7 @@ export async function POST(request: Request) {
     }
 }
 
-export async function GET(request: Request){
+export async function GET(){
     await dbConnect()
 
     const session = await getServerSession(authOptions)
@@ -92,12 +96,15 @@ export async function GET(request: Request){
         return Response.json(
             {
                 success: true,
-                isAcceptingMessages: foundUser.isAcceptingMessage
+                isAcceptingMessage: foundUser.isAcceptingMessage,
+                themePreset: foundUser.themePreset || 'dark',
+                totalMessages: foundUser.messages ? foundUser.messages.length : 0,
+                profileViews: foundUser.profileViews || 0
             },
             { status: 200}
         )
     } catch (error) {
-        console.log("Error is getting message acceptance status");
+        // Error logging removed for security
         return Response.json(
             {
                 success: false,
