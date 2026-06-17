@@ -21,35 +21,57 @@ export async function GET(request: Request){
         )
     }
 
+    const { searchParams } = new URL(request.url)
+    const cursor = searchParams.get('cursor')
+    const limit = parseInt(searchParams.get('limit') || '20')
+
     const userId = new mongoose.Types.ObjectId(user._id);
 
     try {
-        const user = await UserModel.aggregate([
-            { $match: {id: userId}},
-            { $unwind: '$messages'},
-            {$sort: {'messages.createdAt': -1}},
-            {$group: {_id: '$_id', messages: {$push: '$messages'}}}
-        ])
+        const pipeline: any[] = [
+            { $match: {_id: userId}},
+            { $unwind: '$messages'}
+        ];
 
-        if(!user || user.length === 0){
+        if (cursor) {
+            pipeline.push({
+                $match: { 'messages.createdAt': { $lt: new Date(cursor) } }
+            });
+        }
+
+        pipeline.push(
+            {$sort: {'messages.createdAt': -1}},
+            {$limit: limit},
+            {$group: {_id: '$_id', messages: {$push: '$messages'}}}
+        );
+
+        const userAgg = await UserModel.aggregate(pipeline);
+
+        if(!userAgg || userAgg.length === 0){
+            // Return empty messages if user exists but has no messages matching
             return Response.json(
                 {
-                    success: false,
-                    message: "User not found"
+                    success: true,
+                    messages: [],
+                    nextCursor: null
                 },
-                { status: 401}
+                { status: 200}
             )
         }
+
+        const messages = userAgg[0].messages;
+        const nextCursor = messages.length === limit ? messages[messages.length - 1].createdAt : null;
 
         return Response.json(
             {
                 success: true,
-                messages: user[0].messages
+                messages: messages,
+                nextCursor: nextCursor
             },
             { status: 200}
         )
     } catch (error) {
-        console.log("An unexpected error occured: ", error)
+        // Error logging removed for security
         return Response.json(
             {
                 success: false,
