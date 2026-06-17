@@ -51,7 +51,6 @@ function DashboardPage() {
       const response = await axios.get<ApiResponse>('/api/accept-messages')
       setTotalMessages(response.data.totalMessages || 0)
     } catch (error) {
-      console.error("Failed to fetch message stats", error)
     }
   }, [])
 

@@ -23,7 +23,6 @@ export async function POST(request: Request){
             );
         }
     } catch (error) {
-        console.error("Rate limit error:", error);
         // Fail open if Redis is down
     }
 

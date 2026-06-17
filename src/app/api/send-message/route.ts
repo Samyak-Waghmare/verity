@@ -27,7 +27,6 @@ export async function POST(request: Request){
             );
         }
     } catch (error) {
-        console.error("Rate limit error:", error);
         // Fail open if Redis is down so app still works
     }
 
@@ -66,7 +65,6 @@ export async function POST(request: Request){
         try {
             await pusher.trigger(`user-${username}`, 'new-message', savedMessage);
         } catch (pusherError) {
-            console.error("Pusher error:", pusherError);
         }
 
         return Response.json(

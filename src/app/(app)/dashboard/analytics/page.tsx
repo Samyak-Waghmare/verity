@@ -57,7 +57,6 @@ export default function AnalyticsPage() {
       })))
 
     } catch (error) {
-      console.error("Failed to fetch analytics", error)
     } finally {
       setIsLoading(false)
     }
